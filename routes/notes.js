@@ -15,7 +15,9 @@ const knex = require('../knex');
 
 // Get All (and search by query)
 router.get('/', (req, res, next) => {
-  const { searchTerm } = req.query;
+  const {searchTerm, folderId} = req.query;
+
+  console.log(searchTerm, folderId);
 
   knex('notes')
     .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
@@ -26,6 +28,9 @@ router.get('/', (req, res, next) => {
           .where('title', 'like', `%${searchTerm}%`)
           .orWhere('content', 'like', `%${searchTerm}%`);
       }
+    })
+    .modify(function (folderFilter){
+      if(folderId){folderFilter.where('folder_id',folderId);}
     })
     .orderBy('notes.id')
     .then(list => {
@@ -45,11 +50,13 @@ router.get('/', (req, res, next) => {
 
 // Get a single item
 router.get('/:id', (req, res, next) => {
+  console.log('finding a note by id');
+  
   const findId = req.params.id;
-
   knex('notes')
-    .select()
-    .where({id: findId })
+    .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
+    .leftJoin('folders','notes.folder_id', 'folders.id')
+    .where({'notes.id': findId })
     
   // notes.find(id)
     .then(item => {
@@ -70,7 +77,7 @@ router.put('/:id', (req, res, next) => {
 
   /***** Never trust users - validate input *****/
   const updateObj = {};
-  const updateableFields = ['title', 'content'];
+  const updateableFields = ['title', 'content', 'folder_id'];
 
   updateableFields.forEach(field => {
     if (field in req.body) {
@@ -88,12 +95,20 @@ router.put('/:id', (req, res, next) => {
   knex('notes')
     .where({id: upId})
     .update(updateObj)
-    .returning(['id','title','content'])
-
+    .returning('id')
   // notes.update(id, updateObj)
+    .then(noteId =>{
+
+      return knex('notes')
+        .select('notes.id', 'title', 'content', 'folder_id as folderId', 'folders.name as folderName')
+        .leftJoin('folders', 'notes.folder_id','folders.id')
+        .where('notes.id', noteId[0]);
+
+    })
+
     .then(item => {
       if (item) {
-        res.json(item);
+        res.location(`http://${req.headers.host}/notes/${item[0].id}`).status(201).json(item[0]);
       } else {
         next();
       }
@@ -105,9 +120,9 @@ router.put('/:id', (req, res, next) => {
 
 // Post (insert) an item
 router.post('/', (req, res, next) => {
-  const { title, content } = req.body;
+  const { title, content, folder_id } = req.body;
 
-  const newItem = { title, content };
+  const newItem = { title, content,folder_id};
   /***** Never trust users - validate input *****/
   if (!newItem.title) {
     const err = new Error('Missing `title` in request body');
@@ -117,11 +132,19 @@ router.post('/', (req, res, next) => {
 
   knex('notes')
     .insert(newItem)
-    .returning(['id','title', 'content'])
+    .returning('id')
   // notes.create(newItem)
+    .then(noteId =>{
+
+      return knex('notes')
+        .select('notes.id', 'title', 'content', 'folder_id as folderId', 'folders.name as folderName')
+        .leftJoin('folders', 'notes.folder_id','folders.id')
+        .where('notes.id', noteId[0]);
+
+    })
     .then(item => {
       if (item) {
-        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+        res.location(`http://${req.headers.host}/notes/${item[0].id}`).status(201).json(item[0]);
       }
     })
     .catch(err => {
