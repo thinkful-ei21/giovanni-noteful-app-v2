@@ -18,14 +18,14 @@ router.get('/', (req, res, next) => {
   const { searchTerm } = req.query;
 
   knex('notes')
-    .select('id', 'title', 'content')
+    .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
+    .leftJoin('folders','notes.folder_id', 'folders.id')
     .modify(function (searchFilter){
       if(searchTerm){
         searchFilter
           .where('title', 'like', `%${searchTerm}%`)
           .orWhere('content', 'like', `%${searchTerm}%`);
       }
-
     })
     .orderBy('notes.id')
     .then(list => {

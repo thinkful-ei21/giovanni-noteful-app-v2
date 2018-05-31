@@ -2,7 +2,19 @@
 
 const knex = require('../knex');
 
-let searchTerm = 'gaga';
+
+
+
+
+
+
+
+
+
+
+
+
+// let searchTerm = 'gaga';
 
 //get and search
 // knex
@@ -21,7 +33,7 @@ let searchTerm = 'gaga';
 //     console.error(err);
 //   });
 
-let findId = 10;
+// let findId = 10;
 
 //get by id
 
@@ -37,7 +49,7 @@ let findId = 10;
 
 //create obj
 
-let newObj = {title: 'so sample', content: 'would that it were'}
+//let newObj = {title: 'so sample', content: 'would that it were'}
 
 // knex('notes')
 //   .insert(newObj)
@@ -63,16 +75,16 @@ let delId = 14;
 
 // update obj by id and updateObj
 
-let upId = 13;
-let updateObj = {title: 'something entierly different'}
+// let upId = 13;
+// let updateObj = {title: 'something entierly different'}
 
-knex('notes')
-  .where({id: upId})
-  .update(updateObj)
-  .returning(['id','title'])
-  .then(results => {
-    console.log(JSON.stringify(results, null, 2));
-  })
-  .catch(err => {
-    console.error(err);
-  });
+// knex('notes')
+//   .where({id: upId})
+//   .update(updateObj)
+//   .returning(['id','title'])
+//   .then(results => {
+//     console.log(JSON.stringify(results, null, 2));
+//   })
+//   .catch(err => {
+//     console.error(err);
+//   });
