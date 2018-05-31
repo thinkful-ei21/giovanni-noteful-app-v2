@@ -52,6 +52,7 @@ router.put('/:id', (req, res, next) =>{
 });
 
 router.post('/', (req, res, next)=>{
+    console.log('routing works')
   let newName;
   try{
     newName = req.body.newName;
@@ -60,7 +61,7 @@ router.post('/', (req, res, next)=>{
     err.status = 400;
     return next(err);
   }
-
+  console.log(newName)
   knex('folders')
     .insert({name: newName})
     .returning(['id','name'])
@@ -75,12 +76,11 @@ router.post('/', (req, res, next)=>{
 
 router.delete('/:id', (req,res,next)=>{
   const delId = req.params.id;
-
   knex('folders')
     .where({id:delId})
     .del()
-    .then(res =>{
-      res.Status(204).send();
+    .then(() =>{
+      res.status(204).send();
     })
     .catch(err => next(err));
 });

@@ -149,7 +149,7 @@ const noteful = (function () {
         id: store.currentNote.id,
         title: editForm.find('.js-note-title-entry').val(),
         content: editForm.find('.js-note-content-entry').val(),
-        folderId: editForm.find('.js-note-folder-entry').val(),
+        folder_id: editForm.find('.js-note-folder-entry').val(),
         tags: editForm.find('.js-note-tags-entry').val()
       };
 
@@ -217,12 +217,12 @@ const noteful = (function () {
         store.currentNote = {};
       }
 
-      console.info('Get notes by folderId, coming soon...');
-      // api.search('/api/notes', store.currentQuery)
-      //   .then(response => {
-      //     store.notes = response;
-      //     render();
-      //   });
+      // console.info('Get notes by folderId, coming soon...');
+      api.search('/api/notes', store.currentQuery)
+        .then(response => {
+          store.notes = response;
+          render();
+        });
     });
   }
 
@@ -232,17 +232,17 @@ const noteful = (function () {
 
       const newFolderName = $('.js-new-folder-entry').val();
 
-      console.info('Create a folder, coming soon...');
-      // api.create('/api/folders', { name: newFolderName })
-      //   .then(() => {
-      //     $('.js-new-folder-entry').val();
-      //     return api.search('/api/folders');
-      //   }).then(response => {
-      //     store.folders = response;
-      //     render();
-      //   }).catch(err => {
-      //     $('.js-error-message').text(err.responseJSON.message);
-      //   });
+      // console.info('Create a folder, coming soon...');
+      api.create('/api/folders', { newName: newFolderName })
+        .then(() => {
+          $('.js-new-folder-entry').val();
+          return api.search('/api/folders');
+        }).then(response => {
+          store.folders = response;
+          render();
+        }).catch(err => {
+          $('.js-error-message').text(err.responseJSON.message);
+        });
     });
   }
 
@@ -258,15 +258,15 @@ const noteful = (function () {
         store.currentNote = {};
       }
 
-      console.info('Delete a folder, coming soon...');
-      // api.remove(`/api/folders/${folderId}`)
-      //   .then(() => {
-      //     return api.search('/api/folders');
-      //   })
-      //   .then(response => {
-      //     store.folders = response;
-      //     render();
-      //   });
+      // console.info('Delete a folder, coming soon...');
+      api.remove(`/api/folders/${folderId}`)
+        .then(() => {
+          return api.search('/api/folders');
+        })
+        .then(response => {
+          store.folders = response;
+          render();
+        });
     });
   }
 
