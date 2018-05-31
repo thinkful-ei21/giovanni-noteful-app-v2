@@ -21,8 +21,6 @@ router.get('/:id', (req, res, next) => {
   knex('folders')
     .select()
     .where({id: findId })
-      
-    // notes.find(id)
     .then(item => {
       if (item) {res.json(item[0]);}
       else {next();}
@@ -52,7 +50,7 @@ router.put('/:id', (req, res, next) =>{
 });
 
 router.post('/', (req, res, next)=>{
-    console.log('routing works')
+
   let newName;
   try{
     newName = req.body.newName;
@@ -61,7 +59,7 @@ router.post('/', (req, res, next)=>{
     err.status = 400;
     return next(err);
   }
-  console.log(newName)
+
   knex('folders')
     .insert({name: newName})
     .returning(['id','name'])

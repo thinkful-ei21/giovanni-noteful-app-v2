@@ -5,19 +5,12 @@ const express = require('express');
 // Create an router instance (aka "mini-app")
 const router = express.Router();
 
-// TEMP: Simple In-Memory Database
-//const data = require('../db/notes');
-//const simDB = require('../db/simDB');
-//const notes = simDB.initialize(data);
-
 const knex = require('../knex');
 
 
 // Get All (and search by query)
 router.get('/', (req, res, next) => {
   const {searchTerm, folderId} = req.query;
-
-  console.log(searchTerm, folderId);
 
   knex('notes')
     .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
@@ -39,19 +32,11 @@ router.get('/', (req, res, next) => {
     .catch(err => {
       next(err);
     });
-  // notes.filter(searchTerm)
-  //   .then(list => {
-  //     res.json(list);
-  //   })
-  //   .catch(err => {
-  //     next(err);
-  //   });
 });
 
 // Get a single item
 router.get('/:id', (req, res, next) => {
-  console.log('finding a note by id');
-  
+ 
   const findId = req.params.id;
   knex('notes')
     .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
@@ -96,7 +81,6 @@ router.put('/:id', (req, res, next) => {
     .where({id: upId})
     .update(updateObj)
     .returning('id')
-  // notes.update(id, updateObj)
     .then(noteId =>{
 
       return knex('notes')
@@ -133,7 +117,6 @@ router.post('/', (req, res, next) => {
   knex('notes')
     .insert(newItem)
     .returning('id')
-  // notes.create(newItem)
     .then(noteId =>{
 
       return knex('notes')
@@ -159,7 +142,6 @@ router.delete('/:id', (req, res, next) => {
   knex('notes')
     .where({id: delId})
     .del()
-  // notes.delete(id)
     .then(() => {
       res.sendStatus(204);
     })
