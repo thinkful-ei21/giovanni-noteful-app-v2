@@ -30,22 +30,20 @@ router.get('/:id', (req, res, next) => {
 
 router.put('/:id', (req, res, next) =>{
   const updId = req.params.id;
-  let newName;
-  try{
-    newName = req.body.newName;
-  } catch(error){
+  const {newName} = req.body;
+ 
+  if (!newName){
     const err = new Error('missing newName in body');
     err.status = 400;
     return next(err);
   }
+  
 
   knex('folders')
     .update({name:newName})
     .where({id: updId})
-    .then(item=>{
-      if(item){res.json(item);}
-      else{next();}
-    })
+    .returning(['id', 'name'])
+    .then(item =>  item? res.json(item[0]) : next() )
     .catch(err => next(err));
 });
 
